@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 
 def home(request):
-    return HttpResponse('<h1>Paggle Home</h1>')
+    return render(request, 'paggle-home/home.html')
 
 def selectData(request):
     return HttpResponse('<h1>Select Dataset and Model</h1>')
