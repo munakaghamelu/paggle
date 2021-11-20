@@ -1,0 +1,109 @@
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+body {
+    background-color: black;
+}
+
+.paggle-logo {
+    text-decoration: none;
+    font-size: 32px;
+    line-height: 37px;
+    color: #276BF2;
+    padding: 1rem;
+}
+
+.slogan {
+    position: relative;
+
+    font-size: 32px;
+    line-height: 37px;
+    text-align: center;
+    padding-top: 15px;
+    padding-left: 5px;
+    padding-right: 5px;
+    padding-bottom: 15px;
+
+    color: #276BF2;
+
+    text-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+}
+
+.main-nav ul {
+    display: flex;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.main-nav a {
+    color: white;
+    text-decoration: none;
+    padding: 1rem;
+
+    background: #276BF2;
+    box-shadow: 1px 5px 2px rgba(255, 255, 255, 0.25);
+    border-radius: 85px;
+}
+
+.main-nav a:hover {
+    color: grey;
+}
+
+.main-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 80px;
+    padding-right: 30px;
+    flex-wrap: wrap;
+}
+
+.main-footer {
+    width: 100%;
+    height: 100px;
+    background-color: #180a99;
+    position: fixed;
+    bottom: 0;
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+}
+
+.main-footer img {
+    width: 10em;
+    margin-right: .25rem;
+}
+
+.button_placement {
+    display: block;
+    justify-content: center;
+    align-items: center; 
+    justify-content: space-between;
+    padding-top: 100px;
+}
+
+.big-button {
+    text-align: center;
+    align-items: center;
+    text-decoration: none;
+    padding: 1rem;
+    vertical-align: bottom;
+
+    font-size: 32px;
+    line-height: 37px;
+
+    background: #276BF2;
+    box-shadow: 1px 5px 2px rgba(255, 255, 255, 0.25);
+    border-radius: 85px;
+}
+
+.big-button a {
+    color: white;
+    text-decoration: none;
+}
+
+.big-button a:hover {
+    color: grey;
+}
