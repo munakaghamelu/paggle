@@ -1,0 +1,12 @@
+{% extends "paggle-home/base.html" %}
+{% block content %}
+    <div class="button_placement">
+        <div class="big-button">
+            <a href="{% url 'paggle-selectData' %}">Begin Training</a>
+        </div>
+    
+        <div class="big-button">
+            <a href="{% url 'paggle-monitor' %}">Monitor Past Models</a>
+        </div>
+    </div>
+{% endblock content %}
