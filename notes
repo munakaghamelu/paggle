@@ -1,1 +1,3 @@
 testing321
+
+python manage.py makemigrations
