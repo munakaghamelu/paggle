@@ -21,17 +21,24 @@
         </a>
         <nav class="main-nav">
             <ul>
-                <li>Email</li>
-                <li>Password</li>
-                <li>Authentication Code</li>
-                <div class=LoginButton>
+                <li>
                     <a href="#">Login</a>
-                </div>
+                </li>
+                <li>
+                    <a href="{% url 'register' %}">Register</a>
+                </li>
             </ul>
         </nav>
     </header>
 
     <div class="container">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
         {% block content %}{% endblock %}
     </div>
 
