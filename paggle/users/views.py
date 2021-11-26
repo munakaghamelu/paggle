@@ -15,6 +15,7 @@ def register(request):
             code = form.cleaned_data.get('code')
             validCode = False
 
+            # need to change the path of this file and encrypt!
             pwd = os.path.dirname(__file__)
             with open(pwd + '/acceptable_codes') as f:
                 for line in f:
