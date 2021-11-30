@@ -27,8 +27,8 @@ def register(request):
                 username = form.cleaned_data.get('username')
             
                 # flash message to show we've received the data
-                messages.success(request, f'Account created for {username}!')
-                return redirect('paggle-selectTask')
+                messages.success(request, f'Your account has been created! You are now able to Log In')
+                return redirect('login')
             else:
                 form = UserRegisterForm()
     else:

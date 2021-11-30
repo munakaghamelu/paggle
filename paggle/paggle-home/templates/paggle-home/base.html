@@ -20,14 +20,22 @@
             <div class="paggle-logo-name">paggle</div>
         </a>
         <nav class="main-nav">
-            <ul>
-                <li>
-                    <a href="#">Login</a>
-                </li>
-                <li>
-                    <a href="{% url 'register' %}">Register</a>
-                </li>
-            </ul>
+            {% if user.is_authenticated %}
+                <ul>
+                    <li>
+                        <a href="{% url 'logout' %}">Logout</a>
+                    </li>
+                </ul>
+            {% else %}
+                <ul>
+                    <li>
+                        <a href="{% url 'login' %}">Login</a>
+                    </li>
+                    <li>
+                        <a href="{% url 'register' %}">Register</a>
+                    </li>
+                </ul>
+            {% endif %}
         </nav>
     </header>
 

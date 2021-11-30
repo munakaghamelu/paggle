@@ -1,3 +1,6 @@
 testing321
 
 python manage.py makemigrations
+
+--> Add error tags to the code!!
+
