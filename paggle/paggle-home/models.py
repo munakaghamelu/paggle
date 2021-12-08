@@ -23,6 +23,7 @@ class Dataset(models.Model):
 class Model(models.Model):
     name=models.CharField(max_length=50)
     description=models.TextField(blank=True)
+    link=models.TextField(blank=True)
     dataset= models.OneToOneField(Dataset, blank=True, null=True, on_delete=CASCADE)
 
     def __str__(self):
