@@ -2,5 +2,11 @@ testing321
 
 python manage.py makemigrations
 
+python manage.py migrate
+
 --> Add error tags to the code!!
 
+python manage.py runserver
+python manage.py updatemodels # adds to database
+
+python manage.py createsuperuser
