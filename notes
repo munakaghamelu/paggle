@@ -1,8 +1,8 @@
 testing321
 
-python manage.py makemigrations
+python manage.py makemigrations <app_name>
 
-python manage.py migrate
+python manage.py migrate <app_name>
 
 --> Add error tags to the code!!
 
@@ -10,3 +10,5 @@ python manage.py runserver
 python manage.py updatemodels # adds to database
 
 python manage.py createsuperuser
+
+-> Need to deal with potential duplicated data in models
