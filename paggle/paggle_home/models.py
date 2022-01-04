@@ -30,7 +30,6 @@ class Result(models.Model):
     def __str__(self) -> str:
         return f'{self.score} For Model {self.model.name}'
 
-
 class HAM10000_Metadata(models.Model):
     lesion_id=models.TextField(null=True)
     image_id=models.TextField(null=True)
@@ -45,7 +44,7 @@ class HAM10000_Metadata(models.Model):
 
 class Image(models.Model):
     # one to one relationship with metadata
-    dataset = models.ForeignKey(Dataset, blank=True, null=True, on_delete=CASCADE)
+    dataset_id = models.ForeignKey(Dataset, blank=True, null=True, on_delete=CASCADE)
     image_id=models.OneToOneField(HAM10000_Metadata, blank=True, null=True, on_delete=CASCADE)
     link=models.CharField(max_length=100)
     type=models.CharField(max_length=10)
