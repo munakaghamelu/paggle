@@ -2,18 +2,18 @@
 {% block content %}
     <h1>Click "Select Dataset" to select a dataset and read it's description before choosing to use it.</h1>
 
-    <div class="dropdown">
-        <div class="button_placement">
-            <div class="big-button">
-                <a href="#">Select Dataset</a>
-            </div>
-            <div class="dropdown-content">
-                <a href="#">HAM10000</a>
-                <a href="#">Dataset_2</a>
-                <a href="#">Dataset_3</a>
+        <div class="dropdown">
+            <div class="button_placement">
+                <div class="big-button">
+                    <a href="#">Select Dataset</a>
+                </div>
+                <div class="dropdown-content">
+                    {% for dataset in datasets %}
+                    <a href="#">{{ dataset.name }}</a>
+                    {% endfor %}
+                </div>
             </div>
         </div>
-    </div>
 
     <div class="info-box">
         <h1> Dataset Information:</h1>
