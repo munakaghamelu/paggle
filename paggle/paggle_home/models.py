@@ -45,7 +45,7 @@ class HAM10000_Metadata(models.Model):
 class HAM10000_Image(models.Model):
     # one to one relationship with metadata
     dataset=models.ForeignKey(Dataset, blank=True, null=True, on_delete=CASCADE)
-    image_id=models.OneToOneField(HAM10000_Metadata, blank=True, null=True, on_delete=CASCADE)
+    image_id=models.CharField(max_length=100)
     link=models.CharField(max_length=100)
     type=models.CharField(max_length=10)
 

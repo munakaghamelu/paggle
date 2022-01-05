@@ -12,26 +12,20 @@ class Command(BaseCommand):
         pass
 
     def handle(self, *args, **options):
-        # Database Connections
-        # df=pd.read_csv('paggle/ham10000_metadata.csv')
-        # for A,B,C,D,E,F,G in zip(df.lesion_id,df.image_id,df.dx,df.dx_type,df.age,df.sex,df.localization):
-        #     models = HAM10000_Metadata(lesion_id=A,image_id=B,dx=C,dx_type=D,age=E,sex=F,localization=G)
-        #     models.save()
+        #Database Connections
+        df=pd.read_csv('paggle/ham10000_metadata.csv')
+        for A,B,C,D,E,F,G in zip(df.lesion_id,df.image_id,df.dx,df.dx_type,df.age,df.sex,df.localization):
+            models = HAM10000_Metadata(lesion_id=A,image_id=B,dx=C,dx_type=D,age=E,sex=F,localization=G)
+            models.save()
 
-        # df=pd.read_csv('paggle/datasets.csv')
-        # for A,B,C,D in zip(df.name,df.description,df.num_of_images,df.date_added):
-        #     models = Dataset(name=A,description=B,num_of_images=C,date_added=parse_datetime(D))
-        #     models.save()
+        df=pd.read_csv('paggle/datasets.csv')
+        for A,B,C,D in zip(df.name,df.description,df.num_of_images,df.date_added):
+            models = Dataset(name=A,description=B,num_of_images=C,date_added=parse_datetime(D))
+            models.save()
 
         df=pd.read_csv('paggle/ham10000_images.csv')
-        dataset_query_set = Dataset.objects.values()
-        ham10000_row = dataset_query_set.filter(name__startswith='HAM10000').values('id')
-        # prefix = "<QuerySet [{'id':"
-        # suffix = "}]>"
-        # dataset_id = ham10000_row.replace(prefix,'')
-        # dataset_id = dataset_id.replace(suffix,'').strip()
-
+        dataset_query_set = Dataset.objects.get(name__icontains='HAM10000')
         for A,B,C in zip(df.image_id,df.link,df.type):
             # get id of dataset
-            models = HAM10000_Image(dataset=ham10000_row,image_id=A,link=B,type=C)
+            models = HAM10000_Image(dataset=dataset_query_set,image_id=A,link=B,type=C)
             models.save()
