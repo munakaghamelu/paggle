@@ -1,4 +1,47 @@
 {% extends "paggle_home/base.html" %}
 {% block content %}
-    <h1>Select Data Page</h1>
+    <h1>Click "Select Dataset" to select a dataset and read it's description before choosing to use it.</h1>
+
+    <div class="dropdown">
+        <div class="button_placement">
+            <div class="big-button">
+                <a href="#">Select Dataset</a>
+            </div>
+            <div class="dropdown-content">
+                <a href="#">HAM10000</a>
+                <a href="#">Dataset_2</a>
+                <a href="#">Dataset_3</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="info-box">
+        <h1> Dataset Information:</h1>
+        <ul>
+            <li>
+                Description here
+            </li>
+            <li>
+                Dataset Size here
+            </li>
+            <li>
+                Date added here
+            </li>
+        </ul>
+    </div>
+
+    <div class="left">
+        <div class="button-placement">
+            <div class="big-button">
+                <a href="{% url 'paggle-selectTask' %}">← Re-select Task</a>
+            </div>
+        </div>
+    </div>
+    <div class="right">
+        <div class="button-placement">
+            <div class="big-button">
+                <a href="{% url 'paggle-selectModel' %}">Use Dataset →</a>
+            </div>
+        </div>
+    </div>
 {% endblock content %}
