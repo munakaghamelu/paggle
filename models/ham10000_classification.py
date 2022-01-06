@@ -1,3 +1,9 @@
+"""
+Sources:
+https://www.kaggle.com/kmader/dermatology-mnist-loading-and-processing
+https://www.kaggle.com/nightwalk/skin-cancer-classif-using-pytorch-80-acc
+"""
+
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
