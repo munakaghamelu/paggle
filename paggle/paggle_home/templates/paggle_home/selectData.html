@@ -9,26 +9,11 @@
                 </div>
                 <div class="dropdown-content">
                     {% for dataset in datasets %}
-                    <a href="#">{{ dataset.name }}</a>
+                    <a href="{% url 'selectData-detail' dataset.id %}">{{ dataset.name }}</a>
                     {% endfor %}
                 </div>
             </div>
         </div>
-
-    <div class="info-box">
-        <h1> Dataset Information:</h1>
-        <ul>
-            <li>
-                Description here
-            </li>
-            <li>
-                Dataset Size here
-            </li>
-            <li>
-                Date added here
-            </li>
-        </ul>
-    </div>
 
     <div class="left">
         <div class="button-placement">

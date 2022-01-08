@@ -9,9 +9,16 @@ import numpy as np
 import pandas as pd
 import os
 from glob import glob
+
+from sklearn.utils import validation
 import seaborn as sns
+from torch.utils import data
+import torch
+import torchvision.models as models
+import torchvision.transforms as trf
 from PIL import Image
 from itertools import product
+from sklearn.model_selection import train_test_split
 
 """
 Loading and Processing Part
@@ -37,54 +44,141 @@ tile_df = pd.read_csv(os.path.join(base_skin_dir, 'HAM10000_metadata.csv'))
 tile_df['path'] = tile_df['image_id'].map(imageid_path_dict.get)
 tile_df['cell_type'] = tile_df['dx'].map(lesion_type_dict.get) 
 tile_df['cell_type_idx'] = pd.Categorical(tile_df['cell_type']).codes
-
-# load images into the data frame, attached to metadata
-tile_df['image'].map(lambda x : x.shape).value_counts()
-
-# normalise all the colour information
-rgb_info_df = tile_df.apply(lambda x: pd.Series({'{}_mean'.format(k): v for k, v in 
-                                  zip(['Red', 'Green', 'Blue'], 
-                                      np.mean(x['image'], (0, 1)))}),1)
-gray_col_vec = rgb_info_df.apply(lambda x: np.mean(x), 1)
-for c_col in rgb_info_df.columns:
-    rgb_info_df[c_col] = rgb_info_df[c_col]/gray_col_vec
-rgb_info_df['Gray_mean'] = gray_col_vec
-
-for c_col in rgb_info_df.columns:
-    tile_df[c_col] = rgb_info_df[c_col].values
-
-# make MNIST like Dataset
 tile_df[['cell_type_idx', 'cell_type']].sort_values('cell_type_idx').drop_duplicates()
-def package_mnist_df(in_rows, 
-                     image_col_name = 'image',
-                     label_col_name = 'cell_type_idx',
-                     image_shape=(28, 28), 
-                     image_mode='RGB',
-                     label_first=False
-                    ):
-    out_vec_list = in_rows[image_col_name].map(lambda x: 
-                                               np.array(Image.\
-                                                        fromarray(x).\
-                                                        resize(image_shape, resample=Image.LANCZOS).\
-                                                        convert(image_mode)).ravel())
-    out_vec = np.stack(out_vec_list, 0)
-    out_df = pd.DataFrame(out_vec)
-    n_col_names =  ['pixel{:04d}'.format(i) for i in range(out_vec.shape[1])]
-    out_df.columns = n_col_names
-    out_df['label'] = in_rows[label_col_name].values.copy()
-    if label_first:
-        return out_df[['label']+n_col_names]
-    else:
-        return out_df
 
-# Need to figure out how to store this so locally
-for img_side_dim, img_mode in product([8, 28, 64, 128], ['L', 'RGB']):
-    if (img_side_dim==128) and (img_mode=='RGB'):
-        # 128x128xRGB is a biggie
-        break
-    out_df = package_mnist_df(tile_df, 
-                              image_shape=(img_side_dim, img_side_dim),
-                             image_mode=img_mode)
-    out_path = f'hmnist_{img_side_dim}_{img_side_dim}_{img_mode}.csv'
-    out_df.to_csv(out_path, index=False)
-    print(f'Saved {out_df.shape} -> {out_path}: {os.stat(out_path).st_size/1024:2.1f}kb')
+"""
+
+Skin Cancer Classifier Part
+
+"""
+
+model_conv = models.resnet50(pretrained=True)
+num_ftrs = model_conv.fc.in_features
+# Adjust the last layer because only have 7 feature no 1000
+model_conv.fc = torch.nn.Linear(num_ftrs, 7)
+
+# put model on GPU -> is this possible via running on cloud?
+device = torch.device('cuda:0')
+model = model_conv.to(device)
+
+# Split data
+train_df, test_df = train_test_split(tile_df, test_size=0.1)
+validation_df, test_df = train_test_split(test_df, test_size=0.5)
+
+train_df = train_df.reset_index()
+validation_df = validation_df.reset_index()
+test_df = test_df.reset_index()
+
+class Dataset(data.Dataset):
+    # Characterizes a dataset for PyTorch
+    def __init__(self, df, transform=None):
+        # Initialization
+        self.df = df
+        self.transform = transform
+
+    def __len__(self):
+        # Denotes the total number of samples
+        return len(self.df)
+
+    def __getitem__(self, index):
+        # Generates one sample of data
+        # Load data and get label
+        X = Image.open(self.df['path'][index])
+        y = torch.tensor(int(self.df['cell_type_idx'][index]))
+
+        if self.transform:
+            X = self.transform(X)
+
+        return X, y
+
+# Define the parameters for the dataloader
+params = {'batch_size': 4,'shuffle': True,'num_workers': 6}
+
+# define the transformation of the images.
+composed = trf.Compose([trf.RandomHorizontalFlip(), trf.RandomVerticalFlip(), trf.CenterCrop(256), trf.RandomCrop(224),  trf.ToTensor(),
+                        trf.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])])
+
+# Define the trainingsset using the table train_df and using our defined transitions (composed)
+training_set = Dataset(train_df, transform=composed)
+training_generator = data.DataLoader(training_set, **params)
+
+# Same for the validation set:
+validation_set = Dataset(validation_df, transform=composed)
+validation_generator = data.DataLoader(validation_set, **params)
+
+optimizer = torch.optim.Adam(model.parameters(), lr=1e-6)
+criterion = torch.nn.CrossEntropyLoss()
+
+# Training and Testing
+
+max_epochs = 20
+trainings_error = []
+validation_error = []
+for epoch in range(max_epochs):
+    print('epoch:', epoch)
+    count_train = 0
+    trainings_error_tmp = []
+    model.train()
+    for data_sample, y in training_generator:
+        data_gpu = data_sample.to(device)
+        y_gpu = y.to(device)
+        output = model(data_gpu)
+        err = criterion(output, y_gpu)
+        err.backward()
+        optimizer.step()
+        trainings_error_tmp.append(err.item())
+        count_train += 1
+        if count_train >= 100:
+            count_train = 0
+            mean_trainings_error = np.mean(trainings_error_tmp)
+            trainings_error.append(mean_trainings_error)
+            print('trainings error:', mean_trainings_error)
+            break
+    with torch.set_grad_enabled(False):
+        validation_error_tmp = []
+        count_val = 0
+        model.eval()
+        for data_sample, y in validation_generator:
+            data_gpu = data_sample.to(device)
+            y_gpu = y.to(device)
+            output = model(data_gpu)
+            err = criterion(output, y_gpu)
+            validation_error_tmp.append(err.item())
+            count_val += 1
+            if count_val >= 10:
+                count_val = 0
+                mean_val_error = np.mean(validation_error_tmp)
+                validation_error.append(mean_val_error)
+                print('validation error:', mean_val_error)
+                break
+
+"""
+Training errors:
+- trainings_error
+- validation_error
+"""
+
+# Test the classification's ability
+model.eval()
+test_set = Dataset(validation_df, transform=composed)
+test_generator = data.SequentialSampler(validation_set)
+
+result_array = []
+gt_array = []
+for i in test_generator:
+    data_sample, y = validation_set.__getitem__(i)
+    data_gpu = data_sample.unsqueeze(0).to(device)
+    output = model(data_gpu)
+    result = torch.argmax(output)
+    result_array.append(result.item())
+    gt_array.append(y.item())
+    
+correct_results = np.array(result_array)==np.array(gt_array)
+sum_correct = np.sum(correct_results)
+
+# This is the score that will need to be returned to be stored
+# This is the average error 
+accuracy = sum_correct/test_generator.__len__()
+
+# To be able to plot a ROC curve, need the TPR and FPR
+

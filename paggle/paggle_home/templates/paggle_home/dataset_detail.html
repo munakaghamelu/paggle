@@ -1,0 +1,45 @@
+{% extends "paggle_home/base.html" %}
+{% block content %}
+    <h1>You're viewing...</h1>
+
+    <div class="button_placement">
+        <div class="big-button">
+            <h2>{{ object.name }}</h2>
+        </div>
+    </div>
+
+    <div class="info-box">
+        <h1> {{ object.name }}'s Information:</h1>
+        <ul>
+            <li>
+                {{ object.description }}
+            </li>
+            <li>
+                {{ object.num_of_images }}
+            </li>
+            <li>
+                {{ object.date_added }}
+            </li>
+        </ul>
+    </div>
+
+    <div class="left">
+        <div class="button-placement">
+            <div class="big-button">
+                <a href="{% url 'paggle-selectTask' %}">← Re-select Task</a>
+            </div>
+        </div>
+        <div class="button-placement">
+            <div class="big-button">
+                <a href="{% url 'paggle-selectData' %}">← Re-select Dataset</a>
+            </div>
+        </div>
+    </div>
+    <div class="right">
+        <div class="button-placement">
+            <div class="big-button">
+                <a href="{% url 'paggle-selectModel' %}">Use Dataset →</a>
+            </div>
+        </div>
+    </div>
+{% endblock content %}
