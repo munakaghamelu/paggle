@@ -6,7 +6,6 @@ https://stackoverflow.com/questions/56523618/python-download-image-from-url-effi
 https://towardsdatascience.com/build-and-run-a-docker-container-for-your-machine-learning-model-60209c2d7a7f
 https://stackoverflow.com/questions/56523618/python-download-image-from-url-efficiently
 """
-
 # Generic terminal information about model, may not be needed?
 import platform; print(platform.platform())
 import sys; print("Python", sys.version)
@@ -59,10 +58,17 @@ class Dataset(data.Dataset):
 
         return X, y
 
+# Save image from urls stored in csv
+# def load_2(file_name):
+#     with open(file_name.format(file_name), 'r') as csv_file:
+#         for line in reader(csv_file):
+#             if os.path.isfile("input/" + line['image_id'] + "." + line['type']):
+#                 print "Image skipped for {0}".format(line['image_id'])""
+
 # Concurrently download image url into 'input' folder (see docs: https://docs.python.org/3/library/concurrent.futures.html#threadpoolexecutor-example)
 def save_image_from_url(url,  output_folder):
     image = requests.get(url.link)
-    output_path = os.path.join(output_folder, url.image_id, url.type)
+    output_path = os.path.join(output_folder, f'{url.image_id}.{url.type}')
     with open(output_path, "wb") as f:
         f.write(image.content)
 
@@ -93,13 +99,13 @@ def train_and_test():
     # Need to load ham1000_images.csv images into docker image
     images = "./ham10000_images.csv"
     metadata = "./sensitive_metadata.csv"
+    base_skin_dir = os.path.join('input')
+    print(base_skin_dir)
 
-    df_images = pd.to_csv(images)
-    output_folder = 'input'
-    load(df_images, output_folder)
+    df_images = pd.read_csv(images)
+    load(df_images, base_skin_dir)
 
     # This is where we load the path to all images
-    base_skin_dir = os.path.join('..', 'input')
     imageid_path_dict = {os.path.splitext(os.path.basename(x))[0]: x for x in glob(os.path.join(base_skin_dir, '*', '*.jpg'))}
 
     # The categories
@@ -222,6 +228,11 @@ def train_and_test():
 
     # This is the score that will need to be returned to be stored
     accuracy = sum_correct/test_generator.__len__()
+
+    dirpath = os.getcwd()
+    output_path = os.path.join(dirpath, 'output.csv')
+    with open(output_path, "w") as f:
+        f.write(accuracy)
 
 if __name__ == '__main__':
     train_and_test()
