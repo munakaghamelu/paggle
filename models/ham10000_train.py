@@ -7,18 +7,17 @@ https://towardsdatascience.com/build-and-run-a-docker-container-for-your-machine
 https://stackoverflow.com/questions/56523618/python-download-image-from-url-efficiently
 """
 # Generic terminal information about model, may not be needed?
-import platform; print(platform.platform())
+import platform
+
 import sys; print("Python", sys.version)
 import numpy; print("NumPy", numpy.__version__)
 import pandas; print("Pandas", pandas.__version__)
 
-import concurrent.futures
 import os
-import requests
+import urllib.request
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import os
 from glob import glob
 
 from sklearn.utils import validation
@@ -28,7 +27,7 @@ import torchvision.models as models
 import torchvision.transforms as trf
 from PIL import Image
 from sklearn.model_selection import train_test_split
-from joblib import dump # this is used to store models
+import joblib
 
 """
 
@@ -57,35 +56,21 @@ class Dataset(data.Dataset):
             X = self.transform(X)
 
         return X, y
+    
 
-# Save image from urls stored in csv
-# def load_2(file_name):
-#     with open(file_name.format(file_name), 'r') as csv_file:
-#         for line in reader(csv_file):
-#             if os.path.isfile("input/" + line['image_id'] + "." + line['type']):
-#                 print "Image skipped for {0}".format(line['image_id'])""
-
-# Concurrently download image url into 'input' folder (see docs: https://docs.python.org/3/library/concurrent.futures.html#threadpoolexecutor-example)
-def save_image_from_url(url,  output_folder):
-    image = requests.get(url.link)
-    output_path = os.path.join(output_folder, f'{url.image_id}.{url.type}')
-    with open(output_path, "wb") as f:
-        f.write(image.content)
-
-def load(df_images, output_folder):
-    with concurrent.futures.ThreadPoolExecutor(
-        max_workers=5
-        ) as executor: 
-            future_to_url = { 
-                executor.submit(save_image_from_url, url, output_folder): 
-                url for _, url in df_images.iterrows()
-            }
-            for future in concurrent.futures.as_completed(future_to_url):
-                url = future_to_url[future]
-                try:
-                    future.result()
-                except Exception as exc:
-                    print("%r generated an exception: %s" % (url, exc))
+# Download image from url
+def download_image(link, file_name):
+    # urllib.request.urlretrieve(link, file_name)
+    # print(f"Saved {file_name}!")
+    if os.path.exists(file_name) == False:
+        # f = open(file_name, 'wb')
+        # response = requests.get(link)
+        # f.write(response.content)
+        # f.close()
+        urllib.request.urlretrieve(link, file_name)
+        print(f"Saved {file_name}!")
+    else:
+       print(f"Image already exists! at {os.path.basename(file_name)}")
 
 """
 
@@ -99,14 +84,18 @@ def train_and_test():
     # Need to load ham1000_images.csv images into docker image
     images = "./ham10000_images.csv"
     metadata = "./sensitive_metadata.csv"
-    base_skin_dir = os.path.join('input')
-    print(base_skin_dir)
 
     df_images = pd.read_csv(images)
-    load(df_images, base_skin_dir)
 
-    # This is where we load the path to all images
-    imageid_path_dict = {os.path.splitext(os.path.basename(x))[0]: x for x in glob(os.path.join(base_skin_dir, '*', '*.jpg'))}
+    imageid_path_dict = {}
+    for idx, row in df_images.iterrows():
+        image_id = row['image_id']
+        fname = f"{row['image_id']}.{row['type']}"
+        download_image(row['link'],fname)
+        imageid_path_dict[image_id] = f"/models/{fname}"
+        #print("Path at" + imageid_path_dict[image_id])
+
+    print("Finished downloading images.")
 
     # The categories
     lesion_type_dict = {
@@ -140,8 +129,8 @@ def train_and_test():
     model_conv.fc = torch.nn.Linear(num_ftrs, 7)
 
     # put model on GPU -> is this possible via running on cloud?
-    device = torch.device('cuda:0')
-    resnet50_classifier = model_conv.to(device)
+    #device = torch.device('cuda:0')
+    resnet50_classifier = model_conv  
 
     # Define the parameters for the dataloader
     params = {'batch_size': 4,'shuffle': True,'num_workers': 6}
@@ -171,8 +160,8 @@ def train_and_test():
         trainings_error_tmp = []
         resnet50_classifier.train()
     for data_sample, y in training_generator:
-        data_gpu = data_sample.to(device)
-        y_gpu = y.to(device)
+        data_gpu = data_sample
+        y_gpu = y
         output = resnet50_classifier(data_gpu)
         err = criterion(output, y_gpu)
         err.backward()
@@ -190,8 +179,8 @@ def train_and_test():
         count_val = 0
         resnet50_classifier.eval()
         for data_sample, y in validation_generator:
-            data_gpu = data_sample.to(device)
-            y_gpu = y.to(device)
+            data_gpu = data_sample
+            y_gpu = y
             output = resnet50_classifier(data_gpu)
             err = criterion(output, y_gpu)
             validation_error_tmp.append(err.item())
@@ -203,12 +192,11 @@ def train_and_test():
                 print('validation error:', mean_val_error)
                 break
 
-    # Save the resnet50 model to be used in the inference.py file to produce the desired output
-    from joblib import dump
-    dump(resnet50_classifier, 'ham10000_resnet50_classifier.joblib')
+    # Save the resnet50 model to be used in the inference.py file to produce  the desired output
+    joblib.dump(resnet50_classifier, 'ham10000_resnet50_classifier.joblib')
 
     # Test the classification's ability
-    model = load('ham10000_resnet50_classifier.joblib')
+    model = joblib.load('ham10000_resnet50_classifier.joblib')
     model.eval()
     test_set = Dataset(validation_df, transform=composed)
     test_generator = data.SequentialSampler(validation_set)
@@ -217,7 +205,7 @@ def train_and_test():
     gt_array = []
     for i in test_generator:
         data_sample, y = validation_set.__getitem__(i)
-        data_gpu = data_sample.unsqueeze(0).to(device)
+        data_gpu = data_sample.unsqueeze(0)
         output = model(data_gpu)
         result = torch.argmax(output)
         result_array.append(result.item())
@@ -229,10 +217,10 @@ def train_and_test():
     # This is the score that will need to be returned to be stored
     accuracy = sum_correct/test_generator.__len__()
 
-    dirpath = os.getcwd()
-    output_path = os.path.join(dirpath, 'output.csv')
+    output_path = './output.csv'
+    print(f"Model accuracy is {accuracy}, need to get the confusion matrix results later!")
     with open(output_path, "w") as f:
-        f.write(accuracy)
+        f.write(str(accuracy))
 
 if __name__ == '__main__':
     train_and_test()
