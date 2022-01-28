@@ -1,0 +1,19 @@
+model -> accuracy
+specificity and sensitivity, physical methods of how often it gets it right and wrong
+
+give them a place hey can locate an algorithm to run agaisnt the data
+
+container:
+- inputted images
+- applied the algorithm to it-> got an accuracy measure
+
+I've proved I can dockerise images and apply a classifier
+
+- what UI will I give them to enable them to put them into a copy to a doctor file
+-> python script that they injest into 
+
+UI [MAKE IT NICEEE]
+-> input data
+-> create algorithms and test them
+GREAT UI!
+
