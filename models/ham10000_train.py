@@ -27,20 +27,28 @@ import torchvision.models as models
 import torchvision.transforms as trf
 from PIL import Image
 from sklearn.model_selection import train_test_split
+from collections import defaultdict
 import joblib
 
 """
 
-Dataset preprocessing part
+Dataset class
+input:
+data.Dataset
+
+return:
+X - path to images
+y - labels
 
 """
 
 class Dataset(data.Dataset):
     # Characterizes a dataset for PyTorch
-    def __init__(self, df, transform=None):
+    def __init__(self, df, label_col, transform=None):
         # Initialization
         self.df = df
         self.transform = transform
+        self.label_col = label_col
 
     def __len__(self):
         # Denotes the total number of samples
@@ -50,40 +58,47 @@ class Dataset(data.Dataset):
         # Generates one sample of data
         # Load data and get label
         X = Image.open(self.df['path'][index])
-        y = torch.tensor(int(self.df['cell_type_idx'][index]))
+
+        y = torch.tensor(int(self.df[self.label_col][index]))
 
         if self.transform:
             X = self.transform(X)
 
         return X, y
-    
 
 # Download image from url
 def download_image(link, file_name):
-    # urllib.request.urlretrieve(link, file_name)
-    # print(f"Saved {file_name}!")
     if os.path.exists(file_name) == False:
-        # f = open(file_name, 'wb')
-        # response = requests.get(link)
-        # f.write(response.content)
-        # f.close()
         urllib.request.urlretrieve(link, file_name)
         print(f"Saved {file_name}!")
     else:
-       print(f"Image already exists! at {os.path.basename(file_name)}")
+        print(f"Image already exists! at {os.path.basename(file_name)}")
+
 
 """
 
-Training and Testing Part
+Data preprocessing
+
+inputs:
+- path to image csv
+- path to metadata csv
+
+return:
+training_set
+training_generator
+validation_set
+validation_generator
+validation_df
+composed
 
 """
 
-def train_and_test():
+def preprocess_data(images_path, metadata_path):
     # Assumption Web Application will download ham1000_images.csv and ham1000_metadata.csv when user clicks "get datset"
 
     # Need to load ham1000_images.csv images into docker image
-    images = "./ham10000_images.csv"
-    metadata = "./sensitive_metadata.csv"
+    images = images_path
+    metadata = metadata_path
 
     df_images = pd.read_csv(images)
 
@@ -92,10 +107,10 @@ def train_and_test():
         image_id = row['image_id']
         fname = f"{row['image_id']}.{row['type']}"
         download_image(row['link'],fname)
-        imageid_path_dict[image_id] = f"/models/{fname}"
-        #print("Path at" + imageid_path_dict[image_id])
+        imageid_path_dict[image_id] = fname
 
     print("Finished downloading images.")
+    print(imageid_path_dict)
 
     # The categories
     lesion_type_dict = {
@@ -107,7 +122,7 @@ def train_and_test():
         'vasc': 'Vascular lesions',
         'df': 'Dermatofibroma'
     }
-
+  
     # This is where we load the metadata file
     tile_df = pd.read_csv(metadata)
     tile_df['path'] = tile_df['image_id'].map(imageid_path_dict.get)
@@ -123,33 +138,46 @@ def train_and_test():
     validation_df = validation_df.reset_index()
     test_df = test_df.reset_index()
 
-    model_conv = models.resnet50(pretrained=True)
-    num_ftrs = model_conv.fc.in_features
-    # Adjust the last layer because only have 7 feature no 1000
-    model_conv.fc = torch.nn.Linear(num_ftrs, 7)
-
-    # put model on GPU -> is this possible via running on cloud?
-    #device = torch.device('cuda:0')
-    resnet50_classifier = model_conv  
-
     # Define the parameters for the dataloader
     params = {'batch_size': 4,'shuffle': True,'num_workers': 6}
 
     # define the transformation of the images.
     composed = trf.Compose([trf.RandomHorizontalFlip(), trf.RandomVerticalFlip(), trf.CenterCrop(256), trf.RandomCrop(224),  trf.ToTensor(),
                             trf.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])])
-
+    
     # Define the trainingsset using the table train_df and using our defined transitions (composed)
-    training_set = Dataset(train_df, transform=composed)
+    training_set = Dataset(train_df, 'cell_type_idx', transform=composed)
     training_generator = data.DataLoader(training_set, **params)
 
     # Same for the validation set:
-    validation_set = Dataset(validation_df, transform=composed)
+    validation_set = Dataset(validation_df, 'cell_type_idx', transform=composed)
     validation_generator = data.DataLoader(validation_set, **params)
 
+    return training_set, training_generator, validation_set, validation_generator, validation_df, composed
+
+
+"""
+Create model function
+"""
+
+def create_model():
+    model_conv = models.resnet50(pretrained=True)
+    num_ftrs = model_conv.fc.in_features
+    # Adjust the last layer because only have 7 feature no 1000
+    model_conv.fc = torch.nn.Linear(num_ftrs, 7)
+    resnet50_classifier = model_conv  
     optimizer = torch.optim.Adam(resnet50_classifier.parameters(), lr=1e-6)
     criterion = torch.nn.CrossEntropyLoss()
+    
+    return resnet50_classifier, optimizer, criterion
 
+"""
+
+Train function
+
+"""
+
+def train(training_set, training_generator, validation_set, validation_generator, resnet50_classifier, optimizer, criterion):
     # Actual training loop
     max_epochs = 20
     trainings_error = []
@@ -175,34 +203,85 @@ def train_and_test():
             print('trainings error:', mean_trainings_error)
             break
     with torch.set_grad_enabled(False):
-        validation_error_tmp = []
-        count_val = 0
-        resnet50_classifier.eval()
-        for data_sample, y in validation_generator:
-            data_gpu = data_sample
-            y_gpu = y
-            output = resnet50_classifier(data_gpu)
-            err = criterion(output, y_gpu)
-            validation_error_tmp.append(err.item())
-            count_val += 1
-            if count_val >= 10:
-                count_val = 0
-                mean_val_error = np.mean(validation_error_tmp)
-                validation_error.append(mean_val_error)
-                print('validation error:', mean_val_error)
-                break
-
+            validation_error_tmp = []
+            count_val = 0
+            resnet50_classifier.eval()
+            for data_sample, y in validation_generator:
+                data_gpu = data_sample
+                y_gpu = y
+                output = resnet50_classifier(data_gpu)
+                err = criterion(output, y_gpu)
+                validation_error_tmp.append(err.item())
+                count_val += 1
+                if count_val >= 10:
+                    count_val = 0
+                    mean_val_error = np.mean(validation_error_tmp)
+                    validation_error.append(mean_val_error)
+                    print('validation error:', mean_val_error)
+                    break
     # Save the resnet50 model to be used in the inference.py file to produce  the desired output
     joblib.dump(resnet50_classifier, 'ham10000_resnet50_classifier.joblib')
 
+
+"""
+
+Test + Output Helper functions
+
+"""
+
+def get_accuracy(tp, tn, fp, fn):
+    return (tp+tn/(tp+tn+fp+fn))
+
+def get_specificity(tn, fp):
+    return (tn/tn+fp)
+
+def get_sensitivity(tp, fn):
+    return (tp/tp+fn)
+
+def get_metrics(c, confusion_matrix):
+    size = len(confusion_matrix)
+    tp = 0
+    tn = 0
+    fp = 0
+    fn = 0
+
+    individual_class = c
+    tp = confusion_matrix[individual_class][individual_class]
+
+    # get tn for individual class
+    for i in range(size):
+        for j in range(size):
+            if i == j and i != individual_class and j != individual_class:
+                tn += confusion_matrix[i][j]
+
+    # get fp for individual class
+    for j in range(size):
+        if j != individual_class:
+            fp += confusion_matrix[individual_class][j]
+
+    # get fn for individual class
+    for i in range(size):
+        if i != individual_class:
+            fn += confusion_matrix[i][individual_class]
+
+    return tp, tn, fp, fn
+
+def test(validation_df, validation_set, composed):
     # Test the classification's ability
     model = joblib.load('ham10000_resnet50_classifier.joblib')
     model.eval()
-    test_set = Dataset(validation_df, transform=composed)
+    #test_set = Dataset(validation_df, 'cell_type_idx', transform=composed)
     test_generator = data.SequentialSampler(validation_set)
 
     result_array = []
     gt_array = []
+
+    # Code needs to be general for the classifiers
+    classes = ["nv", "mel", "bkl", "bcc", "akiec", "vasc", "df"]
+    size = len(classes)
+
+    confusion_matrix = np.empty(shape=(size, size), dtype=int)
+
     for i in test_generator:
         data_sample, y = validation_set.__getitem__(i)
         data_gpu = data_sample.unsqueeze(0)
@@ -210,17 +289,40 @@ def train_and_test():
         result = torch.argmax(output)
         result_array.append(result.item())
         gt_array.append(y.item())
-        
-    correct_results = np.array(result_array)==np.array(gt_array)
-    sum_correct = np.sum(correct_results)
 
-    # This is the score that will need to be returned to be stored
-    accuracy = sum_correct/test_generator.__len__()
+        predicted_label = result.item()
+        true_label = y.item()
+        confusion_matrix[predicted_label][true_label] += 1
 
-    output_path = './output.csv'
-    print(f"Model accuracy is {accuracy}, need to get the confusion matrix results later!")
-    with open(output_path, "w") as f:
-        f.write(str(accuracy))
+    print("This is what the confusion matrix looks like: ")
+    print(confusion_matrix)
+
+    output_matrix = np.empty(shape=(size, 3), dtype=float)
+
+    for i in range(size):
+        tp, tn, fp, fn = get_metrics(i, confusion_matrix)
+        output_matrix[i][0] = get_accuracy(tp, tn, fp, fn)
+        output_matrix[i][1] = get_specificity(tn, fp)
+        output_matrix[i][2] = get_sensitivity(tp, fn)
+
+    # print(output_matrix)
+    
+    output_results = pd.DataFrame(output_matrix, columns = ['Accuracy','Specificity','Sensitivity'], index = classes)
+
+    # print("This is what the DataFrame output looks like:")
+    # print(output_results)
+
+    output_results.to_csv('./results.csv', index=True)
+
+"""
+Main function
+"""
 
 if __name__ == '__main__':
-    train_and_test()
+    images_path = "./ham10000_images.csv"
+    metadata_path = "./sensitive_metadata.csv"
+    training_set, training_generator, validation_set, validation_generator, validation_df, composed = preprocess_data(images_path, metadata_path)
+    resnet50_classifier, optimizer, criterion = create_model()
+    train(training_set, training_generator, validation_set, validation_generator, resnet50_classifier, optimizer, criterion)
+    test(validation_df, validation_set, composed)
+

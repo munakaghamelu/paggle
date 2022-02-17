@@ -133,11 +133,6 @@ body {
 
 /* CSS for selectData page*/
 
-.dropdown {
-    /* position: relative;
-    display: inline-block; */
-}
-
 .dropdown-content{
     display: none;
     position: absolute;
@@ -180,4 +175,41 @@ body {
     float: right;
     width: 50%;
     padding: 30px 5px 5px 5px;
+}
+
+/* Home page CSS */
+.split {
+    height: 80%;
+    width: 50%;
+    position: relative;
+    z-index: 1;
+    top: 0;
+    overflow: hidden;
+    padding-top: 20px;
+}
+
+.left {
+    align-items: flex-end;
+    text-align: right;
+    padding: 70px 0;
+    padding-right: 10px;
+    left: 0;
+    width: 30%;
+}
+
+.left h2 {
+    font-size: 30px;
+    color: #325AE7;
+}
+
+.left h3 {
+    font-size: 20px;
+}
+
+.right {
+    right: 0;
+    width: 70%;
+    background-color: #325AE7;
+    height: 700px;
+    padding-left: 10px;
 }
