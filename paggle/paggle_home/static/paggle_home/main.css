@@ -99,40 +99,6 @@ body {
     font-size: 2.5rem;
 }
 
-/* CSS for selectData page*/
-
-.dropdown-content{
-    display: none;
-    position: absolute;
-    background-color: #325AE7;
-    width: 100%;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-    z-index: 1;
-    text-align: center;
-    align-items: center;
-}
-
-.dropdown-content a {
-    color: black;
-    padding: 12px 16px;
-    text-decoration: none;
-    display: block;
-}
-
-.dropdown-content a:hover {background-color: #f1f1f1}
-
-.dropdown:hover .dropdown-content {
-    display: block;
-  }
-  
-.dropdown:hover .dropbtn {
-    background-color: #276BF2;
-}
-
-.info-box{
-    font-size: 20px;
-}
-
 .left{
     float: left;
     width: 50%;
@@ -177,7 +143,6 @@ body {
 .right {
     right: 0;
     width: 70%;
-    background-color: #325AE7;
     height: 700px;
     padding-left: 10px;
 }
@@ -219,4 +184,83 @@ body {
     color: black;
 } 
 
+/* Select Data */
 
+.sidenav {
+    background-color: #5281FA;
+    height: 500px;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    padding-top: 10px;
+}
+
+.sidenav a{
+    text-decoration: none;
+    color: white;
+}
+
+.sidenav a:hover{
+    color: black;
+}
+
+.sidebuttons {
+    font-size: 20px;
+    align-items: center;
+    text-align: center;
+    height: 20%;
+    padding-top: 20px;
+    background-color: #325AE7;
+    border: 1px solid black;
+    box-sizing: border-box;
+    box-shadow: 0px 10px 4px rgba(0, 0, 0, 0.25);
+}
+
+.next_button a {
+    text-decoration: none;
+    color: white;
+}
+
+.next_button a:hover {
+    color: black;
+}
+
+.next_button {
+    background-color: #008000;
+    border: 1px solid black;
+    box-sizing: border-box;
+    box-shadow: 0px 10px 4px rgba(0, 0, 0, 0.25);
+    position: absolute;
+    left: 80%;
+    bottom: 20%;
+    font-size: 20px;
+    padding: 5px 5px 5px 5px;
+}
+
+.label {
+    background-color: #5281FA;
+    border-radius: 20px;
+    text-align: center;
+    color: white;
+}
+
+.label_data {
+    font-size: 20px;
+    align-items: center;
+    text-align: center;
+    height: 10%;
+    padding-top: 20px;
+    background-color: #325AE7;
+    border: 1px solid black;
+    box-sizing: border-box;
+    box-shadow: 0px 10px 4px rgba(0, 0, 0, 0.25);
+}
+
+.label_data a {
+    text-decoration: none;
+    color: white;
+}
+
+.label_data a:hover {
+    color: black;
+}

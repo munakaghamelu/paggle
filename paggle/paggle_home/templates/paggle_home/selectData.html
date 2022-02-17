@@ -1,32 +1,29 @@
 {% extends "paggle_home/base.html" %}
 {% block content %}
-    <h1>Click "Select Dataset" to select a dataset and read it's description before choosing to use it.</h1>
-
-        <div class="dropdown">
-            <div class="button_placement">
-                <div class="big-button">
-                    <a href="#">Select Dataset</a>
-                </div>
-                <div class="dropdown-content">
-                    {% for dataset in datasets %}
-                    <a href="{% url 'selectData-detail' dataset.id %}">{{ dataset.name }}</a>
-                    {% endfor %}
-                </div>
-            </div>
-        </div>
-
-    <div class="left">
-        <div class="button-placement">
-            <div class="big-button">
-                <a href="{% url 'paggle-selectTask' %}">← Re-select Task</a>
-            </div>
+    <div class="split left">
+        <div class="sidenav">
+            <h3>Go Back</h3>
+            <div class="sidebuttons">
+                <a href="{% url 'paggle-selectTask' %}">Choose a different Task</a>
+            </div>    
         </div>
     </div>
-    <div class="right">
-        <div class="button-placement">
-            <div class="big-button">
-                <a href="{% url 'paggle-selectModel' %}">Use Dataset →</a>
-            </div>
+
+    <div class="split right">
+        <h1>Step 2: Select Dataset</h1>
+
+        <div class="label">
+            <h2>⇲</h2>
         </div>
+        <div class="label_data">
+            {% for dataset in datasets %}
+                <a href="{% url 'selectData-detail' dataset.id %}">{{ dataset.name }}</a>
+            {% endfor %}
+        </div>
+
+    </div>
+
+    <div class="next_button">
+        <a href="{% url 'paggle-selectModel' %}">Use Dataset</a>
     </div>
 {% endblock content %}
