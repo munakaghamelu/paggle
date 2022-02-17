@@ -1,15 +1,37 @@
 {% extends "paggle_home/base.html" %}
 
 {% block content %}
-    <div class="button_placement">
-        <div class="big-button">
-            <a href="{% url 'paggle-selectData' %}">Begin Training</a>
+
+    <h1>
+        Step 1: Select A Task
+    </h1>
+
+    <div class="select_buttons">
+        <div class="left_button">
+            <h3>
+                Select Dataset
+            </h3>
+            <h3>
+                Inject Model
+            </h3>
+            <h3>
+                Recieve Results
+            </h3>
+            <h1>
+                <a href="{% url 'paggle-selectData' %}"> Begin Training ◄ </a>
+            </h1>
+        </div>
+
+        <div class="right_button">
+            <h3>
+                View Training  
+            </h3>
+            <h3> Results Using </h3>
+            <h3> A Dashboard </h3>
+            <h1>
+                <a href="{% url 'paggle-monitor' %}"> Monitor Models ◄ </a>
+            </h1>
         </div>
     </div>
-    
-    <div class="button_placement">
-        <div class="big-button">
-            <a href="{% url 'paggle-monitor' %}">Monitor Past Models</a>
-        </div>
-    </div>
+
 {% endblock content %}

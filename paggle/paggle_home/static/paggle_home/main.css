@@ -80,38 +80,6 @@ body {
     color: gray;
 }
 
-.button_placement {
-    display: block;
-    justify-content: center;
-    align-items: center; 
-    justify-content: space-between;
-    padding-top: 50px;
-    padding-bottom: 50px;
-}
-
-.big-button {
-    text-align: center;
-    align-items: center;
-    text-decoration: none;
-    padding: 30px 5px 30px 5px;
-    vertical-align: bottom;
-
-    font-size: 32px;
-    line-height: 37px;
-
-    background: #276BF2;
-    box-shadow: 1px 5px 2px rgba(255, 255, 255, 0.25);
-}
-
-.big-button a {
-    color: white;
-    text-decoration: none;
-}
-
-.big-button a:hover {
-    color: black;
-}
-
 .content-section {
     background: #ffffff;
     padding: 10px 20px;
@@ -213,3 +181,42 @@ body {
     height: 700px;
     padding-left: 10px;
 }
+
+/* Select Task */
+
+.select_buttons {
+    position: relative;
+    width: 100%;
+    height: 500px;
+    align-items: center;
+    text-align: center;
+    padding-top: 20px;
+}
+.left_button, .right_button{
+    color: white;
+    text-align: right;
+    display: inline-block;
+    width: 45%;
+    height: 100%;
+    background-color: #5281FA;
+    padding: 200px 10px 50px 10px;
+    border-radius: 20px;
+    box-shadow: 1px 5px 2px rgba(255, 255, 255, 0.25);
+}
+
+.left_button a, .right_button a {
+    color: white;
+    text-decoration: none;
+}
+
+.left_button h1, .right_button h1 {
+    text-align: left;
+    border-top: 2px solid black;
+    padding-top: 20px;
+}
+
+.left_button a:hover, .right_button a:hover {
+    color: black;
+} 
+
+
