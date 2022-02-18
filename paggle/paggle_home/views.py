@@ -25,11 +25,11 @@ class DatasetDetailView(DetailView):
 
 class ModelCreateView(CreateView):
     model = ML_Model
-    fields = ['name','description','imports','c_dataset', 'f_preprocess', 'f_createModel', 'f_train', 'f_test']
+    fields = ['name','description','imports','dataset_class', 'preprocess_function', 'createModel_function', 'train_function', 'test_function']
 
-# @login_required
-# def selectModel(request):
-#     return render(request, 'paggle_home/selectModel.html')
+    def form_valid(self, form):
+        form.instance.author = self.request.user
+        return super().form_valid(form)
 
 @login_required
 def monitor(request):

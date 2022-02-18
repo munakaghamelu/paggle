@@ -3,6 +3,7 @@ from numpy import blackman
 from users.models import Profile
 from django.db.models.deletion import CASCADE
 from django.db.models.fields import BLANK_CHOICE_DASH
+from django.urls import reverse
 
 # Create your models here.
 class Dataset(models.Model):
@@ -16,16 +17,20 @@ class Dataset(models.Model):
 
 class ML_Model(models.Model):
     name=models.CharField(max_length=100, blank=False)
-    description=models.TimeField(blank=False)
+    description=models.CharField(max_length=200, blank=False)
     imports=models.TextField(blank=False)
-    c_dataset=models.TextField(blank=False)
-    f_preprocess=models.TextField(blank=False)
-    f_createModel=models.TextField(blank=False)
-    f_train=models.TextField(blank=False)
-    f_test=models.TextField(blank=False)
+    dataset_class=models.TextField(blank=False)
+    preprocess_function=models.TextField(blank=False)
+    createModel_function=models.TextField(blank=False)
+    train_function=models.TextField(blank=False)
+    test_function=models.TextField(blank=False)
 
     def __str__(self):
         return f'{self.name} to preform {self.description}'
+
+    # redirect page after model has been created, use reverse instead
+    def get_absolute_url(self):
+        return reverse('paggle-runModel', kwargs={})
 
 class Result(models.Model):
     user = models.ForeignKey(Profile, on_delete=models.CASCADE)
