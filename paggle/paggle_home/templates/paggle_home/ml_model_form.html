@@ -1,0 +1,47 @@
+{% extends "paggle_home/base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+
+    <div class="sidebuttons">
+        <a href="#">Click to See Example Script for Guidance</a>
+    </div>
+
+    <div class="content-section">
+        <form method="POST">
+            {% csrf_token %}
+            <fieldset class="form-group">
+                <legend class="border-bottom mb-4">Model Form</legend>
+                {{ form|crispy }}
+            </fieldset>
+            <div class="form-group">
+                <button class="btn-outline-info" type="submit">Create Model</button>
+            </div>
+        </form>
+    </div>
+<!-- 
+    <div class="split left">
+        <div class="sidenav">
+            <h3>Go Back</h3>
+            <div class="sidebuttons">
+                <a href="{% url 'paggle-selectTask' %}">Choose a different Task</a>
+            </div> 
+            
+            <div class="sidebuttons">
+                <a href="{% url 'paggle-selectData' %}">Choose a different Dataset</a>
+            </div> 
+        </div>
+    </div>
+
+    <div class="split right">
+        <div class="split left">
+            <a href="#">Click to See Example Script for Guidance</a>
+        </div>
+        <div class="split right">
+            <h1>
+                Step 3: Creating Model
+            </h1>
+        </div> -->
+
+
+
+{% endblock content %}

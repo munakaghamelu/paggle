@@ -1,4 +1,5 @@
 from django.db import models
+from numpy import blackman
 from users.models import Profile
 from django.db.models.deletion import CASCADE
 from django.db.models.fields import BLANK_CHOICE_DASH
@@ -13,18 +14,22 @@ class Dataset(models.Model):
     def __str__(self):
         return self.name
 
-class Model(models.Model):
-    name=models.CharField(max_length=50)
-    description=models.TextField(blank=True)
-    link=models.TextField(blank=True)
-    dataset= models.OneToOneField(Dataset, blank=True, null=True, on_delete=CASCADE)
+class ML_Model(models.Model):
+    name=models.CharField(max_length=100, blank=False)
+    description=models.TimeField(blank=False)
+    imports=models.TextField(blank=False)
+    c_dataset=models.TextField(blank=False)
+    f_preprocess=models.TextField(blank=False)
+    f_createModel=models.TextField(blank=False)
+    f_train=models.TextField(blank=False)
+    f_test=models.TextField(blank=False)
 
     def __str__(self):
-        return f'{self.name} Works With {self.dataset.name} Dataset'
+        return f'{self.name} to preform {self.description}'
 
 class Result(models.Model):
     user = models.ForeignKey(Profile, on_delete=models.CASCADE)
-    model = models.OneToOneField(Model, blank=True, null=True, on_delete=CASCADE)
+    model = models.OneToOneField(ML_Model, blank=True, null=True, on_delete=CASCADE)
     score = models.IntegerField()
 
     def __str__(self) -> str:
