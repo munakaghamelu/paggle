@@ -1,45 +1,42 @@
 {% extends "paggle_home/base.html" %}
 {% block content %}
-    <h1>You're viewing...</h1>
-
-    <div class="button_placement">
-        <div class="big-button">
-            <h2>{{ object.name }}</h2>
+    <div class="split left">
+        <div class="sidenav">
+            <h3>Go Back</h3>
+            <div class="sidebuttons">
+                <a href="{% url 'paggle-selectTask' %}">Choose a different Task</a>
+            </div> 
+            
+            <div class="sidebuttons">
+                <a href="{% url 'paggle-selectData' %}">Choose a different Dataset</a>
+            </div> 
         </div>
     </div>
 
-    <div class="info-box">
-        <h1> {{ object.name }}'s Information:</h1>
-        <ul>
-            <li>
-                {{ object.description }}
-            </li>
-            <li>
-                {{ object.num_of_images }}
-            </li>
-            <li>
-                {{ object.date_added }}
-            </li>
-        </ul>
+    <div class="split right">
+        <h1>
+            Step 2b: Understanding Dataset
+        </h1>
+
+        <h3>Dataset Name:</h3>
+
+        <p>{{ object.name }}</p>
+
+        <h3>Dataset Description:</h3>
+
+        <p>{{ object.description }}</p>
+
+        <h3>Dataset Size:</h3>
+
+        <p>{{ object.num_of_images }}</p>
+
+        <h3>Date Added:</h3>
+
+        <p>{{ object.date_added }}</p>
     </div>
 
-    <div class="left">
-        <div class="button-placement">
-            <div class="big-button">
-                <a href="{% url 'paggle-selectTask' %}">← Re-select Task</a>
-            </div>
-        </div>
-        <div class="button-placement">
-            <div class="big-button">
-                <a href="{% url 'paggle-selectData' %}">← Re-select Dataset</a>
-            </div>
-        </div>
+    <div class="next_button">
+        <a href="{% url 'paggle-selectModel' %}">Use Dataset</a>
     </div>
-    <div class="right">
-        <div class="button-placement">
-            <div class="big-button">
-                <a href="{% url 'paggle-selectModel' %}">Use Dataset →</a>
-            </div>
-        </div>
-    </div>
+
 {% endblock content %}
