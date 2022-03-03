@@ -20,6 +20,8 @@ import numpy as np
 import pandas as pd
 from glob import glob
 
+import decryption
+
 from sklearn.utils import validation
 from torch.utils import data
 import torch
@@ -222,7 +224,6 @@ def train(training_set, training_generator, validation_set, validation_generator
     # Save the resnet50 model to be used in the inference.py file to produce  the desired output
     joblib.dump(resnet50_classifier, 'ham10000_resnet50_classifier.joblib')
 
-
 """
 
 Test + Output Helper functions
@@ -320,7 +321,10 @@ Main function
 
 if __name__ == '__main__':
     images_path = "./ham10000_images.csv"
-    metadata_path = "./sensitive_metadata.csv"
+    metadata_path = "ham10000_metadata.csv"
+    # decrypt metadata
+    decryption.decrypt(metadata_path)
+    #metadata_path = "./sensitive_metadata.csv"
     training_set, training_generator, validation_set, validation_generator, validation_df, composed = preprocess_data(images_path, metadata_path)
     resnet50_classifier, optimizer, criterion = create_model()
     train(training_set, training_generator, validation_set, validation_generator, resnet50_classifier, optimizer, criterion)

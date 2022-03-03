@@ -1,8 +1,10 @@
+import csv
+from urllib import response
 from django.shortcuts import get_object_or_404, render
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.views.generic import ListView, DetailView, CreateView
-from .models import Dataset, ML_Model
+from .models import Dataset, ML_Model, HAM10000_Image, HAM10000_Metadata
 
 def home(request):
     return render(request, 'paggle_home/home.html')
@@ -24,6 +26,26 @@ class DatasetDetailView(DetailView):
     model = Dataset
 
 class ModelCreateView(CreateView):
+    # export the image data
+    f = open('models/ham10000_metadata.csv', 'w')
+    writer = csv.writer(f)
+    writer.writerow(['lesion_id','image_id','dx','dx_type','age','sex','localization'])
+
+    for patient in HAM10000_Metadata.objects.all().values_list('lesion_id','image_id','dx','dx_type','age','sex','localization'):
+        writer.writerow(patient)
+
+    f.close()
+
+    # export the metadata
+    f = open('models/ham1000_images.csv', 'w')
+    writer = csv.writer(f)
+    writer.writerow(['dataset','image_id','link','type'])
+
+    for patient in HAM10000_Image.objects.all().values_list('dataset','image_id','link','type'):
+        writer.writerow(patient)
+
+    f.close()
+
     model = ML_Model
     fields = ['name','description','imports','dataset_class', 'preprocess_function', 'createModel_function', 'train_function', 'test_function']
 
