@@ -1,14 +1,25 @@
-testing321
+## Django Commands
 
-python manage.py makemigrations <app_name>
+## superuser: muna testing321
 
-python manage.py migrate <app_name>
+python manage.py makemigrations <app_name> # creates tables in db
 
---> Add error tags to the code!!
+python manage.py migrate <app_name> # adds the changes to db
 
-python manage.py runserver
-python manage.py updatemodels # adds to database
+python manage.py runserver # runs web application
 
-python manage.py createsuperuser
+python manage.py updatemodels # populates db
 
--> Need to deal with potential duplicated data in models
+python manage.py createsuperuser # create admin user
+
+## Docker Commands
+
+docker-compose build
+
+docker-compose up
+
+docker-compose down
+
+## Docker Commands for Debugging
+
+docker-compose exec server bash # run bash terminal to debug

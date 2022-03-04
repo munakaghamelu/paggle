@@ -6,6 +6,7 @@ from django.db.models.fields import BLANK_CHOICE_DASH
 from django.urls import reverse
 
 # Create your models here.
+
 class Dataset(models.Model):
     name=models.CharField(max_length=100)
     description=models.TextField(blank=True)
@@ -16,17 +17,10 @@ class Dataset(models.Model):
         return self.name
 
 class ML_Model(models.Model):
-    name=models.CharField(max_length=100, blank=False)
-    description=models.CharField(max_length=200, blank=False)
-    imports=models.TextField(blank=False)
-    dataset_class=models.TextField(blank=False)
-    preprocess_function=models.TextField(blank=False)
-    createModel_function=models.TextField(blank=False)
-    train_function=models.TextField(blank=False)
-    test_function=models.TextField(blank=False)
+    raw_link=models.CharField(max_length=500)
 
     def __str__(self):
-        return f'{self.name} to preform {self.description}'
+        return self.raw_link
 
     # redirect page after model has been created, use reverse instead
     def get_absolute_url(self):
@@ -39,6 +33,7 @@ class Result(models.Model):
 
     def __str__(self) -> str:
         return f'{self.score} For Model {self.model.name}'
+
 
 class HAM10000_Metadata(models.Model):
     lesion_id=models.TextField(null=True)
