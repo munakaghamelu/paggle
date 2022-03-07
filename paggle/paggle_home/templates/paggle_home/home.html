@@ -1,4 +1,5 @@
 {% extends "paggle_home/base.html" %}
+{% load static %}
 {% block content %}
 
 <div class="split left">
@@ -11,7 +12,7 @@
 </div>
 <div class="split right">
     <div class="centered">
-        <h2>Include gif of finished website.</h2>
+        <img src="{% static 'paggle_home/paggle_clip.gif' %}" alt="Paggle Clip" style="width:1000px; height:600px;">
     </div>
 </div>
 {% endblock content %}
