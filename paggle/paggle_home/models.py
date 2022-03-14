@@ -29,7 +29,8 @@ class ML_Model(models.Model):
 class Result(models.Model):
     user = models.ForeignKey(Profile, on_delete=models.CASCADE)
     model = models.OneToOneField(ML_Model, blank=True, null=True, on_delete=CASCADE)
-    score = models.IntegerField()
+    confusion_matrix = models.FileField()
+    metric_results = models.FileField()
 
     def __str__(self) -> str:
         return f'{self.score} For Model {self.model.name}'

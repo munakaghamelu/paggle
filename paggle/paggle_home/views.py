@@ -8,6 +8,9 @@ from django.views.generic import ListView, DetailView, CreateView
 from .models import Dataset, ML_Model, HAM10000_Image, HAM10000_Metadata
 import requests
 
+import plotly.express as px
+import pandas as pd
+
 def home(request):
     return render(request, 'paggle_home/home.html')
 
@@ -37,7 +40,27 @@ class ModelCreateView(CreateView):
 
 @login_required
 def monitor(request):
-    return render(request, 'paggle_home/monitor.html')
+    confusion_matrix = pd.read_csv('models/confusion_matrix.csv')
+    metrics = pd.read_csv('models/metric_results.csv')
+
+    cm_np = confusion_matrix.to_numpy()
+    classes = cm_np[:,0:1]
+    cm_np = cm_np[:,1:]
+    class_label = classes.tolist()
+    labels = []
+
+    for c in class_label:
+        str_c = str(c)
+        labels.append(str_c[2:-2])
+
+    matrix_plot_div = px.imshow(cm_np, 
+                                labels=dict(x="Classes", y="Classes", color="Correct Classifications"),
+                                x=labels,
+                                y=labels,
+                                text_auto=True,
+                                output_type='div')
+    matrix_plot_div.update_xaxes(side="top")
+    return render(request, 'paggle_home/monitor.html', context={'matrix_plot_div': matrix_plot_div})
 
 @login_required
 def runModel(request):

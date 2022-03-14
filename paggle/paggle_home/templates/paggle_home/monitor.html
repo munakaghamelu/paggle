@@ -1,4 +1,8 @@
 {% extends "paggle_home/base.html" %}
 {% block content %}
     <h1>Monitor Page</h1>
+
+    {% autoescape off %}
+    {{ matrix_plot_div }}
+    {% endautoescape %}
 {% endblock content %}
