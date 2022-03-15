@@ -104,7 +104,6 @@ def runModel(request):
     return render(request, 'paggle_home/runModel.html')
 
 class ExecuteDockerCompose(View):
-    model = Result
     def get(self, request):
         # Execute docker-compose.yml
         subprocess.call(['docker-compose','-f', 'models/docker-compose.yml','up'])
