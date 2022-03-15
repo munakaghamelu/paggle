@@ -16,6 +16,7 @@ urlpatterns = [
     path('createModel/new/', ModelCreateView.as_view(), name='paggle-createModel'),
     path('monitor/', views.monitor, name='paggle-monitor'),
     path('runModel/', views.runModel, name='paggle-runModel'),
+    path('executeProcess/', views.ExecuteDockerCompose, name='paggle-executeProcess'),
 ]
 
 # Looking for naming pattern of template -> <app>/<model>_<viewtype>.html

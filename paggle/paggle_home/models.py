@@ -29,12 +29,11 @@ class ML_Model(models.Model):
 class Result(models.Model):
     user = models.ForeignKey(Profile, on_delete=models.CASCADE)
     model = models.OneToOneField(ML_Model, blank=True, null=True, on_delete=CASCADE)
-    confusion_matrix = models.FileField()
-    metric_results = models.FileField()
+    confusion_matrix = models.FileField(null=True)
+    metric_results = models.FileField(null=True)
 
     def __str__(self) -> str:
         return f'{self.score} For Model {self.model.name}'
-
 
 class HAM10000_Metadata(models.Model):
     lesion_id=models.TextField(null=True)

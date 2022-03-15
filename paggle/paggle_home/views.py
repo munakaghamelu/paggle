@@ -2,12 +2,14 @@ import csv
 from curses import raw
 from urllib import response
 from django.shortcuts import get_object_or_404, render
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
-from django.views.generic import ListView, DetailView, CreateView
-from .models import Dataset, ML_Model, HAM10000_Image, HAM10000_Metadata
+from django.views.generic import ListView, DetailView, CreateView, View
+from django.urls import reverse
+from sklearn.metrics import confusion_matrix
+from .models import Dataset, ML_Model, HAM10000_Image, HAM10000_Metadata, Result
 import requests
-
+import subprocess
 import plotly.express as px
 import pandas as pd
 
@@ -100,3 +102,24 @@ def runModel(request):
     # Update results table with results.csv output
     
     return render(request, 'paggle_home/runModel.html')
+
+class ExecuteDockerCompose(View):
+    model = Result
+    def get(self, request):
+        # Execute docker-compose.yml
+        subprocess.call(['docker-compose','-f', 'models/docker-compose.yml','up'])
+
+        # store the outputs into result model table
+
+        current_user = request.user.id
+        current_model = ML_Model.objects.get(pk=1) # bug:this will be wrong, need to change if works
+        result_df=pd.read_csv('models/metric_results.csv')
+        confusion_matrix_df=pd.read_csv('models/confusion_matrix.csv')
+        model = Result(current_user, current_model, result_df, confusion_matrix_df)
+        model.save()
+
+        # stop the docker container
+        subprocess.call(['docker','stop','ham1000_model'])
+
+        # Return - redirect back to page to load the results in plotly !!
+        return HttpResponseRedirect(reverse("runModel.html"))
