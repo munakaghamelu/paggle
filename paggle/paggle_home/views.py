@@ -1,5 +1,6 @@
 import csv
 from curses import raw
+from email.policy import default
 from urllib import response
 from django.shortcuts import get_object_or_404, render
 from django.http import HttpResponse, HttpResponseRedirect
@@ -56,13 +57,17 @@ def monitor(request):
         labels.append(str_c[2:-2])
 
     matrix_plot_div = px.imshow(cm_np, 
-                                labels=dict(x="Classes", y="Classes", color="Correct Classifications"),
+                                labels=dict(x="Classes", 
+                                            y="Classes", 
+                                            color="Total Classifications"
+                                            ),
                                 x=labels,
                                 y=labels,
-                                text_auto=True,
-                                output_type='div')
+                                text_auto=True)
     matrix_plot_div.update_xaxes(side="top")
-    return render(request, 'paggle_home/monitor.html', context={'matrix_plot_div': matrix_plot_div})
+    matrix = matrix_plot_div.to_html(full_html=False, default_height=500, default_width=700)
+    context = {'matrix':matrix}
+    return render(request, 'paggle_home/monitor.html', context)
 
 @login_required
 def runModel(request):

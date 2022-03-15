@@ -2,7 +2,10 @@
 {% block content %}
     <h1>Monitor Page</h1>
 
-    {% autoescape off %}
-    {{ matrix_plot_div }}
-    {% endautoescape %}
+    {% if matrix %}
+        {{ matrix|safe }}
+    {% else %}
+    <p> No graph was provided!</p>
+    {% endif %}
+
 {% endblock content %}
