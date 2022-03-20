@@ -100,16 +100,12 @@ composed
 def preprocess_data(images_path, metadata_path):
   # Assumption Web Application will download ham1000_images.csv and ham1000_metadata.csv when user clicks "get datset"
 
-  # Need to load ham1000_images.csv images into docker image
-  images = "/content/drive/MyDrive/COMP0138/ham10000_images.csv"
-  metadata = "/content/drive/MyDrive/COMP0138/sensitive_metadata.csv"
-
-  df_images = pd.read_csv(images)
+  df_images = pd.read_csv(images_path)
 
   imageid_path_dict = {}
   for idx, row in df_images.iterrows():
       image_id = row['image_id']
-      fname = f"/content/drive/MyDrive/COMP0138/data/{row['image_id']}.{row['type']}"
+      fname = f"./{row['image_id']}.{row['type']}"
       download_image(row['link'],fname)
       imageid_path_dict[image_id] = fname
 
@@ -128,7 +124,7 @@ def preprocess_data(images_path, metadata_path):
   }
   
   # This is where we load the metadata file
-  tile_df = pd.read_csv(metadata)
+  tile_df = pd.read_csv(metadata_path)
   tile_df['path'] = tile_df['image_id'].map(imageid_path_dict.get)
   tile_df['cell_type'] = tile_df['dx'].map(lesion_type_dict.get) 
   tile_df['cell_type_idx'] = pd.Categorical(tile_df['cell_type']).codes
