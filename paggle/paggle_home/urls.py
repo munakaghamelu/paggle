@@ -2,7 +2,8 @@ from django.urls import path
 from .views import (
     DatasetListView, 
     DatasetDetailView, 
-    ModelCreateView
+    ModelCreateView,
+    ExecuteDockerCompose
     )
 from . import views
 from users import views as user_views
@@ -16,7 +17,7 @@ urlpatterns = [
     path('createModel/new/', ModelCreateView.as_view(), name='paggle-createModel'),
     path('monitor/', views.monitor, name='paggle-monitor'),
     path('runModel/', views.runModel, name='paggle-runModel'),
-    path('executeProcess/', views.ExecuteDockerCompose, name='paggle-executeProcess'),
+    path('executeProcess/', ExecuteDockerCompose.as_view(), name='paggle-executeProcess'),
 ]
 
 # Looking for naming pattern of template -> <app>/<model>_<viewtype>.html

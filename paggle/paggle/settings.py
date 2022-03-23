@@ -31,7 +31,6 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'rest_framework',
     'paggle_home.apps.PaggleHomeConfig', # needed for django to find templates and models for db
     'users.apps.UsersConfig',
     'crispy_forms',

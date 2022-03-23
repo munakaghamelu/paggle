@@ -33,7 +33,7 @@ class Result(models.Model):
     metric_results = models.FileField(null=True)
 
     def __str__(self) -> str:
-        return f'{self.score} For Model {self.model.name}'
+        return f'Metrics For Model {self.model}'
 
 class HAM10000_Metadata(models.Model):
     lesion_id=models.TextField(null=True)

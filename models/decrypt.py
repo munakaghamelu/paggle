@@ -1,9 +1,10 @@
 # Code to Decrypt
 from cryptography.fernet import Fernet
 import pandas as pd
+import os
 
 # Get the key from the file -> Need to store key on secure server
-file = open('../paggle/key.key', 'rb')
+file = open('./key.key', 'rb')
 key = file.read()
 file.close()
 fernet = Fernet(key)
