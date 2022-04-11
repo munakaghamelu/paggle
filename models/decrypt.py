@@ -19,4 +19,4 @@ df_decryp = token_4.applymap(lambda x: x.decode('utf-8'))
 df_decryp.insert(1, 'image_id', image_id_vals)
 
 # stays in the web application server, never goes to model
-df_decryp.to_csv('./ham10000_metadata.csv')
+df_decryp.to_csv('./sensitive_ham10000_metadata.csv')

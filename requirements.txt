@@ -1,0 +1,10 @@
+django==3.2.13
+django-crispy-forms==1.14.0
+numpy==1.17.3
+windows-curses==2.3.0
+scikit-learn==1.0.2
+requests==2.27.1
+plotly==5.7.0
+pandas==1.1.5
+Pillow==9.1.0
+

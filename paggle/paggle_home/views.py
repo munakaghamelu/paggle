@@ -16,6 +16,7 @@ import plotly.express as px
 import pandas as pd
 from django.core.files import File
 from users.models import Profile
+from sys import platform
 
 def home(request):
     return render(request, 'paggle_home/home.html')
@@ -114,25 +115,29 @@ def runModel(request):
 class ExecuteDockerCompose(View):
     def get(self, request):
         # Execute docker-compose.yml
-        subprocess.call(['docker-compose','-f', 'models/docker-compose.yml','build'])
 
-        subprocess.call(['docker-compose','-f', 'models/docker-compose.yml','up'])
+        if platform == "linux" or platform == "linux2" or platform == "darwin":
+            subprocess.call(['docker-compose','-f', 'models/docker-compose.yml','build'])
+            subprocess.call(['docker-compose','-f', 'models/docker-compose.yml','up'])
 
-        # store the outputs into result model table
+            # store the outputs into result model table
+            current_user = Profile.objects.first()
+            current_model = ML_Model.objects.first() # bug:this will be wrong, need to change if works
+            metric_file = open('models/metric_results.csv')
+            django_metric_file = File(metric_file)
+            cm_file = open('models/confusion_matrix.csv')
+            django_cm_file = File(cm_file)
+            model = Result(user=current_user, model=current_model, confusion_matrix=django_metric_file, metric_results=django_cm_file)
+            model.save()
+            
+            # stop the docker container
+            subprocess.call(['docker','stop','ham1000_model'])
 
-        current_user = Profile.objects.first()
-        current_model = ML_Model.objects.first() # bug:this will be wrong, need to change if works
-        # result_df=pd.read_csv('models/metric_results.csv')
-        # confusion_matrix_df=pd.read_csv('models/confusion_matrix.csv')
-        metric_file = open('models/metric_results.csv')
-        django_metric_file = File(metric_file)
-        cm_file = open('models/confusion_matrix.csv')
-        django_cm_file = File(cm_file)
-        model = Result(user=current_user, model=current_model, confusion_matrix=django_metric_file, metric_results=django_cm_file)
-        model.save()
+        else:
+            subprocess.Popen(['docker-compose','-f','models\docker-compose.yml','build'])
+            subprocess.Popen(['docker-compose','-f','models\docker-compose.yml','up'])
 
-        # stop the docker container
-        subprocess.call(['docker','stop','ham1000_model'])
+            subprocess.Popen(['docker','stop','ham1000_model'])
 
         # Return - redirect back to page to load the results in plotly !!
         return HttpResponse("Executed!")
