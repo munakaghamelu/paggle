@@ -8,3 +8,5 @@ requests
 sklearn
 dump
 cryptography==36.0.2
+requests[security]
+pycurl
