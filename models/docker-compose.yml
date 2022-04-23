@@ -2,7 +2,8 @@ version: '3'
 services:
   ham1000_model:
     build: .
-    volumes:
-      - ".:/models"
     ports:
       - "8080:80"
+    volumes:
+      - C:\Users\UCL053749\Pictures:/models
+ 
