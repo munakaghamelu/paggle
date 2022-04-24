@@ -12,6 +12,8 @@ python manage.py updatemodels # populates db
 
 python manage.py createsuperuser # create admin user
 
+
+ 
 ## Docker Commands
 
 docker-compose build

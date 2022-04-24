@@ -5,5 +5,5 @@ services:
     ports:
       - "8080:80"
     volumes:
-      - C:\Users\UCL053749\Pictures:/models
+      - .:/models
  

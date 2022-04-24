@@ -10,8 +10,8 @@ COPY key.key ./
 COPY debug.py ./
 RUN pip install --no-cache-dir -r requirements.txt
 RUN python3 ./decrypt.py
-RUN python3 ./debug.py
-# RUN python3 ./user_model.py
+# RUN python3 ./debug.py
+RUN python3 ./user_model.py
 
 # For testing (hacking)
 # COPY requirements.txt ./

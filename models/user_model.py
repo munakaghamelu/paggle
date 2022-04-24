@@ -58,17 +58,18 @@ class Dataset(data.Dataset):
 
   def __getitem__(self, index):
     try:
+      # print(f"The path is: {self.df['path'][index]}")
+      # print("Crashes!")
       X = Image.open(self.df['path'][index])
       y = torch.tensor(int(self.df['cell_type_idx'][index]))
+      
       if self.transform:
           X = self.transform(X)
     finally:
-      print("Image retrieved.")
+      print("Done.")
     return X, y
 
-def download_image(link):
-  link_fname = link.strip().split('/'[-1])
-  image_path = f"./{link_fname}"
+def download_image(link, image_path):
   urllib.request.urlretrieve(link, image_path)
   return image_path
 
@@ -96,8 +97,8 @@ def preprocess_data(images_path, metadata_path):
       image_id = row['image_id']
       image_type = row['type']
       fname = f"{image_id}.{image_type}"
-      image_path= download_image(row['link'])
-      imageid_path_dict[image_id] = image_path
+      download_image(row['link'], fname)
+      imageid_path_dict[image_id] = fname
       # Check if file is a valid image
       # img = Image.open(image_path)
       # print(img.format)
@@ -156,7 +157,7 @@ def create_model():
   # Adjust the last layer because only have 7 feature no 1000
   model_conv.fc = torch.nn.Linear(num_ftrs, 7)
   # put model on GPU -> is this possible via running on cloud?
-#   device = torch.device('cuda:0')
+  device = torch.device('cuda:0')
   resnet50_classifier = model_conv
   optimizer = torch.optim.Adam(resnet50_classifier.parameters(), lr=1e-6)
   criterion = torch.nn.CrossEntropyLoss()
@@ -288,7 +289,7 @@ def test(validation_generator):
   confusion_matrix = np.zeros(shape=(size, size), dtype=int)
 
   for i in test_generator:
-    data_sample, y = test_set.__getitem__(i)
+    data_sample, y = validation_set.__getitem__(i)
     data_gpu = data_sample.unsqueeze(0)
     output = model(data_gpu)
     result = torch.argmax(output)

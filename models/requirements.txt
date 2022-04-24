@@ -11,5 +11,3 @@ cryptography==36.0.2
 requests[security]
 pycurl
 django==3.2.13
-opencv-python
-opencv-python-headless
