@@ -15,7 +15,7 @@ come as a result of using a docker container. Upon successful execution of a ML 
 1. Activate django-env virtual environment
 
 ```bash
-clone 
+clone https://github.com/munakaghamelu/paggle.git
 cd paggle
 source django-env/bin/activate
 ```
