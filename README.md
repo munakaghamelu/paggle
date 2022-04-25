@@ -1,6 +1,8 @@
 # Paggle
 
-An Interface Connecting ML Models With Encrypted Medical Data
+An Interface Connecting ML Models With Encrypted Medical Data.
+
+![Alt Text](https://media.giphy.com/media/vFKqnCdLPNOKc/giphy.gif)
 
 # Abstract
 
@@ -53,6 +55,6 @@ python manage.py migrate
 
 3. Problems with Django, Docker or Python -> Read documentation, Django YouTube tutorial
 
-https://docs.djangoproject.com/en/4.0/
-https://docs.docker.com/
-https://www.youtube.com/watch?v=UmljXZIypDc&list=PL-osiE80TeTtoQCKZ03TU5fNfx2UY6U4p&ab_channel=CoreySchafer
+- https://docs.djangoproject.com/en/4.0/
+- https://docs.docker.com/
+- https://www.youtube.com/watch?v=UmljXZIypDc&list=PL-osiE80TeTtoQCKZ03TU5fNfx2UY6U4p&ab_channel=CoreySchafer
