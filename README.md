@@ -2,7 +2,7 @@
 
 An Interface Connecting ML Models With Encrypted Medical Data.
 
-![Alt Text](https://media.giphy.com/media/vFKqnCdLPNOKc/giphy.gif)
+![Alt Text](https://raw.githubusercontent.com/munakaghamelu/paggle/master/paggle/paggle_home/static/paggle_home/paggle_clip.gif)
 
 # Abstract
 
