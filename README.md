@@ -8,7 +8,7 @@ There are a number of problems in the field of health and medicine that can be s
 such as machine learning, to solve these problems is troublesome. The research aspect of this project was to determine whether it was possible maintain the integrity and sensitivity of encrypted medical data through a system accessible by many users. This was proven by firstly presenting an encryption script that uses python’s fernet library to encrypt the mock sensitive data. Then the robustness of the system was proven by a failed hacking attempt, in which a mock malicious python script was written to try to extract the sensitive data once it was decrypted inside the part of the system not accessible to the user. Further, the research phase presents various case studies on why Machine Learning and Health Data are such interesting parallels to intertwine. Regarding the development part of this project, the main contributions made was a system called Paggle. Paggle is a MVP that has a database that is able to be injected with encrypted medical data and then presented to user upon a specific dataset request. Paggle takes a unique approach by utilising the security and isolated merits that
 come as a result of using a docker container. Upon successful execution of a ML model within Paggle’s dockerised models container, a confusion matrix and other useful metrics are presented to illustrate how well a model has performed. Paggle itself is an interface that has been designed with accessibility and usability in mind. Paggle is an Open Source.
 
-### Paggle User Manual
+# Paggle User Manual
 
 ## Steps to Startup Paggle
 
